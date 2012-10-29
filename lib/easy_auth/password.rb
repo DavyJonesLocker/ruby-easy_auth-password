@@ -1,16 +1,26 @@
 require 'easy_auth'
 require 'easy_auth/password/engine'
 require 'easy_auth/password/version'
-require 'easy_auth/password/models/account'
 require 'easy_auth/password/routes'
 
 module EasyAuth
+
+  module Password
+    extend ActiveSupport::Autoload
+    autoload :Controllers
+    autoload :Models
+  end
+
   def self.password_identity_model(controller = nil)
     EasyAuth::Identities::Password
   end
 
   module Controllers
     autoload :PasswordReset
+
+    module Sessions
+      include EasyAuth::Password::Controllers::Sessions
+    end
   end
 
   module Mailers

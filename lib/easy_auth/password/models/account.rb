@@ -1,4 +1,3 @@
-module EasyAuth::Password::Models; end
 module EasyAuth::Password::Models::Account
   extend EasyAuth::ReverseConcern
 
