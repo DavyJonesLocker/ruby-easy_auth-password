@@ -13,10 +13,9 @@ module EasyAuth::Password::Models::Account
     # Callbacks
     before_create :setup_password_identity,  :if => :run_password_identity_validations?
     before_update :update_password_identity, :if => :run_password_identity_validations?
-  end
 
-  def password_identity
-    identities.select{ |identity| EasyAuth.password_identity_model === identity }.first
+    # Associations
+    has_one :password_identity, :class_name => 'EasyAuth::Identities::Password', :foreign_key => :account_id
   end
 
   def run_password_identity_validations?

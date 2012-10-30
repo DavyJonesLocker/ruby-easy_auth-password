@@ -14,4 +14,10 @@ describe EasyAuth::Models::Account do
   it 'does not skip identity validations if new record with password' do
     User.new(:password => 'test').valid?.should be_false
   end
+
+  it 'provides a method to the password identity' do
+    user = User.create(:email => 'test@example.com', :password => 'password', :password_confirmation => 'password')
+    password_identity = user.identities.first
+    password_identity.should eq user.password_identity
+  end
 end
