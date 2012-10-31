@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe EasyAuth::Models::Account do
+describe EasyAuth::Password::Models::Account do
   it 'skips password identity validations if password identity is not present' do
     User.create.new_record?.should be_false
   end
