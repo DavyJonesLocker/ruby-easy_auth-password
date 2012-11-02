@@ -51,21 +51,14 @@ describe EasyAuth::Identities::Password do
       it 'returns the user' do
         EasyAuth::Identities::Password.authenticate(controller).should be_instance_of EasyAuth::Identities::Password
       end
-      context 'with remember' do
-        before { params[:remember] = true }
-        it { EasyAuth::Identities::Password.authenticate(controller).remember.should be_true }
-      end
-      context 'without remember' do
-        it { EasyAuth::Identities::Password.authenticate(controller).remember.should be_false }
-      end
     end
-    context 'correct username bad password' do
+    context 'incorrect username bad password' do
       before do
         params[:password] = 'bad'
         create(:password_identity)
       end
       it 'returns nil' do
-        EasyAuth::Identities::Password.authenticate(controller).should be_nil
+        EasyAuth::Identities::Password.authenticate(controller).should be_false
       end
     end
     context 'bad username and password' do

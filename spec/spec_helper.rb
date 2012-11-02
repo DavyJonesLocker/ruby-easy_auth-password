@@ -31,5 +31,12 @@ RSpec.configure do |config|
   config.before(:each, :type => :request) do
     Dir[File.join(ENGINE_RAILS_ROOT, 'spec/requests/step_helpers/**/*.rb')].each { |f| require f }
   end
+  config.backtrace_clean_patterns = [
+    # /\/lib\d*\/ruby\//,
+    # /bin\//,
+    # /gems/,
+    # /spec\/spec_helper\.rb/,
+    # /lib\/rspec\/(core|expectations|matchers|mocks)/
+  ]
 end
 

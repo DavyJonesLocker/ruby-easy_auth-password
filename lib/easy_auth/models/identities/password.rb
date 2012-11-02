@@ -21,44 +21,14 @@ module EasyAuth::Models::Identities::Password
       def self.authenticate(controller)
         attributes = controller.params[:identities_password]
         return nil if attributes.nil?
-
-        if identity = where(arel_table[:username].matches(attributes[:username].try(&:strip))).first.try(:authenticate, attributes[:password])
-          identity.remember = attributes[:remember]
-          identity
-        else
-          nil
-        end
+        where(arel_table[:username].matches(attributes[:username].try(&:strip))).first.try(:authenticate, attributes[:password])
       end
 
-      def self.new_session(controller)
-        controller.instance_variable_set(:@identity, self.new)
-      end
     end
-  end
-
-  def set_account_session(session)
-    account.set_session(session)
-  end
-
-  def remember
-    @remember
-  end
-
-  def remember=(value)
-    @remember = ::ActiveRecord::ConnectionAdapters::Column.value_to_boolean(value)
   end
 
   def generate_reset_token!
     update_column(:reset_token, URI.escape(_generate_token(:reset).gsub(/[\.|\\\/]/,'')))
     reset_token
-  end
-
-  def generate_remember_token!
-    update_column(:remember_token, _generate_token(:remember))
-    remember_token
-  end
-
-  def remember_time
-    1.year
   end
 end

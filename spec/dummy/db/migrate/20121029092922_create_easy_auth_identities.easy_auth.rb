@@ -1,7 +1,7 @@
 # This migration comes from easy_auth (originally 20120227014023)
 class CreateEasyAuthIdentities < ActiveRecord::Migration
   def change
-    create_table :easy_auth_identities do |t|
+    create_table :identities do |t|
       t.string  :username
       t.string  :token
       t.string  :account_type
@@ -13,7 +13,7 @@ class CreateEasyAuthIdentities < ActiveRecord::Migration
     end
 
     [:username, :reset_token, :remember_token].each do |column|
-      add_index :easy_auth_identities, column
+      add_index :identities, column
     end
   end
 end
