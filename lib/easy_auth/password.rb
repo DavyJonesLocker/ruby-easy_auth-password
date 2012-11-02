@@ -11,10 +11,6 @@ module EasyAuth
     autoload :Models
   end
 
-  def self.password_identity_model(controller = nil)
-    EasyAuth::Identities::Password
-  end
-
   module Controllers
     autoload :PasswordReset
 

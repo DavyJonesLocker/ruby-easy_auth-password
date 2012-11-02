@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe EasyAuth::Identities::Password do
+describe Identities::Password do
   let(:params) { Hash.new }
   let(:controller) do
     controller = mock('Controller')
@@ -23,7 +23,7 @@ describe EasyAuth::Identities::Password do
     context 'existing record' do
       subject do
         create(:password_identity)
-        EasyAuth::Identities::Password.last
+        Identities::Password.last
       end
       it { should have_valid(:password).when('password', nil, '') }
     end
@@ -31,7 +31,7 @@ describe EasyAuth::Identities::Password do
     context 'password reset' do
       subject do
         create(:password_identity)
-        identity = EasyAuth::Identities::Password.last
+        identity = Identities::Password.last
         identity.password_reset = true
         identity
       end
@@ -49,7 +49,7 @@ describe EasyAuth::Identities::Password do
         create(:password_identity)
       end
       it 'returns the user' do
-        EasyAuth::Identities::Password.authenticate(controller).should be_instance_of EasyAuth::Identities::Password
+        Identities::Password.authenticate(controller).should be_instance_of Identities::Password
       end
     end
     context 'incorrect username bad password' do
@@ -58,18 +58,18 @@ describe EasyAuth::Identities::Password do
         create(:password_identity)
       end
       it 'returns nil' do
-        EasyAuth::Identities::Password.authenticate(controller).should be_false
+        Identities::Password.authenticate(controller).should be_false
       end
     end
     context 'bad username and password' do
       before { params.merge!(:username => 'bad@example.com', :password => 'bad') }
       it 'returns nil' do
-        EasyAuth::Identities::Password.authenticate(controller).should be_nil
+        Identities::Password.authenticate(controller).should be_nil
       end
     end
     context 'no attributes given' do
       it 'returns nil' do
-        EasyAuth::Identities::Password.authenticate(controller).should be_nil
+        Identities::Password.authenticate(controller).should be_nil
       end
     end
   end
@@ -79,7 +79,7 @@ describe EasyAuth::Identities::Password do
       identity = create(:password_identity, :account => build(:user))
       identity.remember_token.should be_nil
       identity.generate_remember_token!
-      identity = EasyAuth::Identities::Password.last
+      identity = Identities::Password.last
       identity.remember_token.should_not be_nil
     end
   end
@@ -89,7 +89,7 @@ describe EasyAuth::Identities::Password do
       identity = create(:password_identity, :account => build(:user))
       identity.reset_token.should be_nil
       identity.generate_reset_token!
-      identity = EasyAuth::Identities::Password.last
+      identity = Identities::Password.last
       identity.reset_token.should_not be_nil
     end
   end

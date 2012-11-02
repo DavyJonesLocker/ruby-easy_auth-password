@@ -15,7 +15,7 @@ module EasyAuth::Password::Models::Account
     before_update :update_password_identity, :if => :run_password_identity_validations?
 
     # Associations
-    has_one :password_identity, :class_name => 'EasyAuth::Identities::Password', :foreign_key => :account_id
+    has_one :password_identity, :class_name => 'Identities::Password', :foreign_key => :account_id
   end
 
   def run_password_identity_validations?
@@ -25,7 +25,7 @@ module EasyAuth::Password::Models::Account
   private
 
   def setup_password_identity
-    self.identities << EasyAuth.password_identity_model.new(password_identity_attributes)
+    self.identities << EasyAuth.find_identity_model(:password).new(password_identity_attributes)
   end
 
   def update_password_identity

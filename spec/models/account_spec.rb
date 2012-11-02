@@ -7,7 +7,7 @@ describe EasyAuth::Password::Models::Account do
 
   it 'does not skip identity validations if identity is present' do
     user = User.new
-    user.identities << EasyAuth::Identities::Password.new
+    user.identities << Identities::Password.new
     user.valid?.should be_false
   end
 
