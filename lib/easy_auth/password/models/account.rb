@@ -25,7 +25,7 @@ module EasyAuth::Password::Models::Account
   private
 
   def setup_password_identity
-    self.identities << EasyAuth.find_identity_model(:password).new(password_identity_attributes)
+    self.identities << EasyAuth.find_identity_model(:identity => :password).new(password_identity_attributes)
   end
 
   def update_password_identity
