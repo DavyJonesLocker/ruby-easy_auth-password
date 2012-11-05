@@ -4,7 +4,7 @@
 [![Dependency Status](https://gemnasium.com/dockyard/easy_auth-password.png?travis)](https://gemnasium.com/dockyard/easy_auth-password)
 [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/dockyard/easy_auth-password)
 
-Dead simple drop in authentication for Rails
+Password support for [EasyAuth](https://github.com/dockyard/easy_auth)
 
 ## Installation ##
 
@@ -14,13 +14,12 @@ In your Gemfile add the following:
 gem 'easy_auth-password'
 ```
 
-After running Bundler you'll need to install the migrations
+Then follow the general installation instructions for
+[EasyAuth](https://github.com/dockyard/easy_auth#installation)
 
-```ruby
-rake easy_auth-password:install:migrations
-```
+## Usage ##
 
-Then run your migrations.
+`EasyAuth-Password` will handle most of what you want automatically. 
 
 ## Authors ##
 
