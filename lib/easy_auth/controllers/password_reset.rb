@@ -11,8 +11,8 @@ module EasyAuth::Controllers::PasswordReset
 
   def create
     if @identity = EasyAuth.find_identity_model(params).where(:username => params[:identities_password][:username]).first
-      @identity.generate_reset_token!
-      PasswordResetMailer.reset(@identity.id).deliver
+      plaintext_reset_token = @identity.generate_reset_token!
+      PasswordResetMailer.reset(@identity.id, plaintext_reset_token).deliver
     else
       @identity = EasyAuth.find_identity_model(params).new(params[:identities_password])
     end
@@ -31,18 +31,22 @@ module EasyAuth::Controllers::PasswordReset
 
   private
 
+  def find_identity_from_reset_token
+    if @identity = EasyAuth.find_identity_model(params).authenticate(self, :reset_token)
+      @identity.password_reset = true
+    else
+      flash[:error] = I18n.t('easy_auth.password_reset.edit.error')
+      redirect_to root_path
+    end
+  end
+
   def scope_to_password_params(key)
     { :password => params[key][:password], :password_confirmation => params[key][:password_confirmation] }
   end
 
-  def find_identity_from_reset_token
-    @identity = EasyAuth.find_identity_model(params).where(:reset_token => params[:reset_token].to_s).first
-    @identity.password_reset = true
-  end
-
   def after_successful_password_reset(identity)
-    identity.set_account_session(session)
-    identity.update_column(:reset_token, nil)
+    session[:identity_id] = identity.id
+    identity.update_column(:reset_token_digest, nil)
     redirect_to after_successful_password_reset_url(identity), :notice => I18n.t('easy_auth.password_reset.update.notice')
   end
 

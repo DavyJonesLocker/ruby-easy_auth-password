@@ -74,23 +74,14 @@ describe Identities::Password do
     end
   end
 
-  describe '#generate_remember_token' do
-    it 'sets a unique remember token' do
-      identity = create(:password_identity, :account => build(:user))
-      identity.remember_token.should be_nil
-      identity.generate_remember_token!
-      identity = Identities::Password.last
-      identity.remember_token.should_not be_nil
-    end
-  end
-
   describe '#password_reset' do
     it 'sets a unique reset token' do
       identity = create(:password_identity, :account => build(:user))
-      identity.reset_token.should be_nil
-      identity.generate_reset_token!
+      identity.reset_token_digest.should be_nil
+      unencrypted_token = identity.generate_reset_token!
       identity = Identities::Password.last
-      identity.reset_token.should_not be_nil
+      identity.reset_token_digest.should_not be_nil
+      BCrypt::Password.new(identity.reset_token_digest).should eq unencrypted_token
     end
   end
 end

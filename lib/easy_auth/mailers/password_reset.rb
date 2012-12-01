@@ -3,9 +3,9 @@ module EasyAuth::Mailers::PasswordReset
     base.clear_action_methods!
   end
 
-  def reset(id)
-    @identity = EasyAuth.identity_model.find(id)
-    @url = edit_password_url(@identity.reset_token)
+  def reset(id, unencrypted_reset_token)
+    @identity = EasyAuth.find_identity_model(:identity => :password).find(id)
+    @url = edit_password_reset_url(:username => URI.escape(@identity.username), :reset_token => unencrypted_reset_token)
     mail :to => @identity.account.email, :subject => 'Password reset'
   end
 end
