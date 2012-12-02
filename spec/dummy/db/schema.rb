@@ -11,17 +11,17 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121201051821) do
+ActiveRecord::Schema.define(:version => 20121201175946) do
 
   create_table "identities", :force => true do |t|
     t.string   "username"
     t.string   "token"
     t.string   "account_type"
     t.integer  "account_id"
-    t.string   "remember_token_digest"
     t.string   "type"
     t.datetime "created_at",            :null => false
     t.datetime "updated_at",            :null => false
+    t.string   "remember_token_digest"
     t.string   "reset_token_digest"
   end
 

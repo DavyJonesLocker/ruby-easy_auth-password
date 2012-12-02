@@ -6,7 +6,7 @@ module EasyAuth::Password::Routes
     get  '/password_reset' => 'password_reset#new',    :defaults => { :identity => :password }, :as => :password_reset
     post '/password_reset' => 'password_reset#create', :defaults => { :identity => :password }
 
-    get  '/password_reset/:username/:reset_token' => 'password_reset#edit',   :defaults => { :identity => :password }, :constraints => { :username => /.+/ }, :as => :edit_password_reset
-    put  '/password_reset/:username/:reset_token' => 'password_reset#update', :defaults => { :identity => :password }, :constraints => { :username => /.+/ }
+    get  '/password_reset/:id/:reset_token' => 'password_reset#edit',   :defaults => { :identity => :password }, :as => :edit_password_reset
+    put  '/password_reset/:id/:reset_token' => 'password_reset#update', :defaults => { :identity => :password }
   end
 end

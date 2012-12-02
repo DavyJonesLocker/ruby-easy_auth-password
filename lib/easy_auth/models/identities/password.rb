@@ -21,7 +21,7 @@ module EasyAuth::Models::Identities::Password
       def self.authenticate(controller, token_name = :password)
         attributes = send("attributes_for_#{token_name}", controller)
         return nil if attributes.nil?
-        where(arel_table[:username].matches(attributes[:username].try(&:strip))).first.try(:authenticate, attributes[token_name], token_name)
+        where(send("conditions_for_#{token_name}", attributes)).first.try(:authenticate, attributes[token_name], token_name)
       end
 
       def authenticate(unencrypted_token, token_name = :password)
@@ -37,11 +37,27 @@ module EasyAuth::Models::Identities::Password
       def self.attributes_for_reset_token(controller)
         controller.params
       end
+
+      def self.attributes_for_remember_token(cookies)
+        { :id => cookies[:remember_id], :remember_token => cookies[:remember_token] }
+      end
+
+      def self.conditions_for_password(attributes)
+        arel_table[:username].matches(attributes[:username].try(&:strip))
+      end
+
+      def self.conditions_for_reset_token(attributes)
+        { :id => attributes[:id] }
+      end
+
+      def self.conditions_for_remember_token(attributes)
+        { :id => attributes[:id] }
+      end
     end
   end
 
   def generate_reset_token!
-    unencrypted_token = URI.escape(_generate_token(:reset_token).gsub(/[\.|\\\/]/,''))
+    unencrypted_token = _generate_token(:reset_token)
     update_column(:reset_token_digest, BCrypt::Password.create(unencrypted_token))
     unencrypted_token
   end

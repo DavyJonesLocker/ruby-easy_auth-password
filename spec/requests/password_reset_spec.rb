@@ -20,7 +20,7 @@ feature 'Password reset' do
     visit sign_in_path
     fill_in 'Username', :with => user.email
     fill_in 'Password', :with => 'new_password'
-    click_button 'Submit'
+    click_button 'Sign in'
     page.should have_content 'test@example.com'
   end
 

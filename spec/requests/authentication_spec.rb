@@ -6,7 +6,7 @@ feature 'Authentication' do
     visit sign_in_path
     fill_in 'Username', :with => 'test@example.com'
     fill_in 'Password', :with => 'password'
-    click_button 'Submit'
+    click_button 'Sign in'
 
     current_path.should eq dashboard_path
     page.should have_content 'test@example.com'
@@ -14,7 +14,7 @@ feature 'Authentication' do
 
   scenario 'with invalid attributes' do
     visit sign_in_path
-    click_button 'Submit'
+    click_button 'Sign in'
 
     current_path.should eq sign_in_path
   end
@@ -57,7 +57,7 @@ feature 'Unauthenticated' do
 
     fill_in 'Username', :with => user.email
     fill_in 'Password', :with => user.password
-    click_button 'Submit'
+    click_button 'Sign in'
 
     page.should have_content 'My profile'
   end

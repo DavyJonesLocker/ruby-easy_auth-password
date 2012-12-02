@@ -6,7 +6,6 @@ class CreateEasyAuthIdentities < ActiveRecord::Migration
       t.string  :token
       t.string  :account_type
       t.integer :account_id
-      t.string  :remember_token_digest
       t.string  :type
       t.timestamps
     end

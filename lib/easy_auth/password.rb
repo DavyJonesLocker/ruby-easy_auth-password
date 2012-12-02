@@ -8,6 +8,7 @@ module EasyAuth
   module Password
     extend ActiveSupport::Autoload
     autoload :Controllers
+    autoload :Helpers
     autoload :Models
   end
 
@@ -19,6 +20,12 @@ module EasyAuth
     end
   end
 
+  module Helpers
+    module EasyAuth
+      include ::EasyAuth::Password::Helpers::EasyAuth
+    end
+  end
+
   module Mailers
     autoload :PasswordReset
   end
@@ -26,6 +33,9 @@ module EasyAuth
   module Models
     module Account
       include EasyAuth::Password::Models::Account
+    end
+    module Identity
+      include EasyAuth::Password::Models::Identity
     end
 
     module Identities
