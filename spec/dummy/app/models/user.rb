@@ -1,4 +1,4 @@
 class User < ActiveRecord::Base
   include EasyAuth::Models::Account
-  attr_accessible :email
+  attr_accessible :email, :username
 end

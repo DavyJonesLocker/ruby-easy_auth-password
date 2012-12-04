@@ -9,57 +9,71 @@ module EasyAuth::Password::Models::Account
 
     # Validations
     validates :password, :presence => { :on => :create, :if => :run_password_identity_validations? }, :confirmation => true
-    validates identity_username_attribute, :presence => true, :if => :run_password_identity_validations?
+    identity_username_attributes.each do |attribute|
+      validates attribute, :presence => true, :if => :run_password_identity_validations?
+    end
 
     # Callbacks
-    before_create :setup_password_identity,  :if => :run_password_identity_validations?
-    before_update :update_password_identity, :if => :run_password_identity_validations?
+    before_create :setup_password_identities,  :if => :run_password_identity_validations?
+    before_update :update_password_identities, :if => :run_password_identity_validations?
 
     # Associations
-    has_one :password_identity, :class_name => 'Identities::Password', :foreign_key => :account_id
+    has_many :password_identities, :class_name => 'Identities::Password', :foreign_key => :account_id
   end
 
   module ClassMethods
-    # Will attempt to find the username attribute
+    # Will attempt to find the username attributes of :username and :email
+    # Will return an array of any defined on the model
+    # If neither are defined an exception will be raised
     #
-    # First will check to see if #identity_username_attribute is already defined in the model.
-    #
-    # If not, will check to see if `username` exists as a column on the record
-    # If not, will check to see if `email` exists as a column on the record
+    # Override this method with an array of symbols for custom attributes
     #
     # @return [Symbol]
-    def identity_username_attribute
-      if respond_to?(:super)
-        super
-      elsif column_names.include?('username')
-        :username
-      elsif column_names.include?('email')
-        :email
-      else
+    def identity_username_attributes
+      attributes = ['email', 'username'].inject([]) do |attributes, attr|
+        if column_names.include?(attr)
+          attributes << attr
+        end
+
+        attributes
+      end
+
+      if attributes.empty?
         raise EasyAuth::Password::Models::Account::NoIdentityUsernameError, 'your model must have either a #username or #email attribute. Or you must override the .identity_username_attribute class method'
+      else
+        attributes.map(&:to_sym)
       end
     end
   end
 
-  def identity_username_attribute
-    self.send(self.class.identity_username_attribute)
+  def identity_username_attributes
+    self.class.identity_username_attributes
   end
 
   def run_password_identity_validations?
-    (self.new_record? && self.password.present?) || self.password_identity.present?
+    (self.new_record? && self.password.present?) || self.password_identities.present?
   end
 
   private
 
-  def setup_password_identity
-    self.identities << EasyAuth.find_identity_model(:identity => :password).new(password_identity_attributes)
+  def setup_password_identities
+    identity_username_attributes.each do |attribute|
+      self.identities << EasyAuth.find_identity_model(:identity => :password).new(password_identity_attributes(attribute))
+    end
   end
 
-  def update_password_identity
-    self.password_identity.update_attributes(password_identity_attributes)
+  def update_password_identities
+    identity_username_attributes.each do |attribute|
+      if send("#{attribute}_changed?")
+        identity = password_identities.find { |identity| identity.username == send("#{attribute}_was") }
+      else
+        identity = password_identities.find { |identity| identity.username == send(attribute) }
+      end
+      identity.update_attributes(password_identity_attributes(attribute))
+    end
   end
 
-  def password_identity_attributes
-    { :username => self.identity_username_attribute, :password => self.password, :password_confirmation => self.password_confirmation }
+  def password_identity_attributes(attribute)
+    { :username => send(attribute), :password => self.password, :password_confirmation => self.password_confirmation }
   end
 end

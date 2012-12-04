@@ -1,10 +1,21 @@
 require 'spec_helper'
 
 feature 'Authentication' do
-  scenario 'with valid attributes' do
+  scenario 'with valid attributes using email' do
     create(:user)
     visit sign_in_path
-    fill_in 'Username', :with => 'test@example.com'
+    fill_in 'Username or Email', :with => 'test@example.com'
+    fill_in 'Password', :with => 'password'
+    click_button 'Sign in'
+
+    current_path.should eq dashboard_path
+    page.should have_content 'test@example.com'
+  end
+
+  scenario 'with valid attributes using username' do
+    create(:user)
+    visit sign_in_path
+    fill_in 'Username or Email', :with => 'testuser'
     fill_in 'Password', :with => 'password'
     click_button 'Sign in'
 
@@ -28,6 +39,7 @@ feature 'Authentication' do
 
   scenario 'updating the account should update the identity' do
     user = create(:user)
+    user.reload
     user.update_attributes(:email => 'changed@example.com', :password => 'changed_password', :password_confirmation => 'changed_password')
     sign_in_with(user)
   end
@@ -55,7 +67,7 @@ feature 'Unauthenticated' do
 
     visit profile_path
 
-    fill_in 'Username', :with => user.email
+    fill_in 'Username or Email', :with => user.email
     fill_in 'Password', :with => user.password
     click_button 'Sign in'
 

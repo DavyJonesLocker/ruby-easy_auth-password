@@ -1,6 +1,6 @@
 <%= form_for @identity, :url => main_app.sign_in_path do |f| %>
   <p>
-    <%= f.label :username %>
+    <%= f.label :username, 'Username or Email' %>
     <%= f.text_field :username %>
   </p>
   <p>
