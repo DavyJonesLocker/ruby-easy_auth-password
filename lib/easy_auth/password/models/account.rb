@@ -30,18 +30,12 @@ module EasyAuth::Password::Models::Account
     #
     # @return [Symbol]
     def identity_username_attributes
-      attributes = ['email', 'username'].inject([]) do |attributes, attr|
-        if column_names.include?(attr)
-          attributes << attr
-        end
-
-        attributes
-      end
+      attributes = (['email', 'username'] & column_names).map(&:to_sym)
 
       if attributes.empty?
         raise EasyAuth::Password::Models::Account::NoIdentityUsernameError, 'your model must have either a #username or #email attribute. Or you must override the .identity_username_attribute class method'
       else
-        attributes.map(&:to_sym)
+        attributes
       end
     end
   end
