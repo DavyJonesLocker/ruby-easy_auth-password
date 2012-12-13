@@ -1,59 +1,60 @@
 module EasyAuth::Models::Identities::Password
   include EasyAuth::TokenGenerator
+  extend EasyAuth::ReverseConcern
 
-  def self.included(base)
-    base.class_eval do
-      has_secure_password
+  reverse_included do
+    has_secure_password
 
-      # Attributes
-      attr_accessor   :password_reset
-      attr_accessible :username, :password, :password_confirmation, :remember
-      alias_attribute :password_digest, :token
+    # Attributes
+    attr_accessor   :password_reset
+    attr_accessible :uid, :password, :password_confirmation, :remember
+    alias_attribute :password_digest, :token
 
-      # Relationships
-      belongs_to :account, :polymorphic => true
+    # Relationships
+    belongs_to :account, :polymorphic => true
 
-      # Validations
-      validates :username, :uniqueness => { :case_sensitive => false }, :presence => true
-      validates :password, :presence => { :on => :create }
-      validates :password, :presence => { :if => :password_reset }
+    # Validations
+    validates :uid, :uniqueness => { :case_sensitive => false }, :presence => true
+    validates :password, :presence => { :on => :create }
+    validates :password, :presence => { :if => :password_reset }
+  end
 
-      def self.authenticate(controller, token_name = :password)
-        attributes = send("attributes_for_#{token_name}", controller)
-        return nil if attributes.nil?
-        where(send("conditions_for_#{token_name}", attributes)).first.try(:authenticate, attributes[token_name], token_name)
-      end
-
-      def authenticate(unencrypted_token, token_name = :password)
-        BCrypt::Password.new(send("#{token_name}_digest")) == unencrypted_token && self
-      end
-
-      private
-
-      def self.attributes_for_password(controller)
-        controller.params[:identities_password]
-      end
-
-      def self.attributes_for_reset_token(controller)
-        controller.params
-      end
-
-      def self.attributes_for_remember_token(cookies)
-        { :id => cookies[:remember_id], :remember_token => cookies[:remember_token] }
-      end
-
-      def self.conditions_for_password(attributes)
-        arel_table[:username].matches(attributes[:username].try(&:strip))
-      end
-
-      def self.conditions_for_reset_token(attributes)
-        { :id => attributes[:id] }
-      end
-
-      def self.conditions_for_remember_token(attributes)
-        { :id => attributes[:id] }
-      end
+  module ClassMethods
+    def authenticate(controller, token_name = :password)
+      attributes = send("attributes_for_#{token_name}", controller)
+      return nil if attributes.nil?
+      where(send("conditions_for_#{token_name}", attributes)).first.try(:authenticate, attributes[token_name], token_name)
     end
+
+    private
+
+    def attributes_for_password(controller)
+      controller.params[:identities_password]
+    end
+
+    def attributes_for_reset_token(controller)
+      controller.params
+    end
+
+    def attributes_for_remember_token(cookies)
+      { :id => cookies[:remember_id], :remember_token => cookies[:remember_token] }
+    end
+
+    def conditions_for_password(attributes)
+      arel_table[:uid].matches(attributes[:uid].try(&:strip))
+    end
+
+    def conditions_for_reset_token(attributes)
+      { :id => attributes[:id] }
+    end
+
+    def conditions_for_remember_token(attributes)
+      { :id => attributes[:id] }
+    end
+  end
+
+  def authenticate(unencrypted_token, token_name = :password)
+    BCrypt::Password.new(send("#{token_name}_digest")) == unencrypted_token && self
   end
 
   def generate_reset_token!

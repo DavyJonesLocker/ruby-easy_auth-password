@@ -8,7 +8,7 @@ feature 'Password reset' do
   scenario 'when the identity exists' do
     user = create(:user)
     visit password_reset_path
-    fill_in 'Username', :with => user.email
+    fill_in 'Uid', :with => user.email
     click_button 'Submit'
     open_email(user.email)
     current_email.click_link 'password'
@@ -27,7 +27,7 @@ feature 'Password reset' do
   scenario 'failed password reset' do
     user = create(:user)
     visit password_reset_path
-    fill_in 'Username', :with => user.email
+    fill_in 'Uid', :with => user.email
     click_button 'Submit'
     open_email(user.email)
     current_email.click_link 'password'

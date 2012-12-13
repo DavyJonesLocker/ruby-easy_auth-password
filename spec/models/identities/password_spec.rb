@@ -10,8 +10,8 @@ describe Identities::Password do
 
   describe 'username' do
     before { create(:password_identity) }
-    it { should     have_valid(:username).when('another_test@example.com') }
-    it { should_not have_valid(:username).when('test@example.com', 'TEST@EXAMPLE.COM', nil, '') }
+    it { should     have_valid(:uid).when('another_test@example.com') }
+    it { should_not have_valid(:uid).when('test@example.com', 'TEST@EXAMPLE.COM', nil, '') }
   end
 
   describe 'password' do
@@ -41,9 +41,9 @@ describe Identities::Password do
 
   describe '.authenticate' do
     before do
-      params.merge!(:username => 'test@example.com')
+      params.merge!(:uid => 'test@example.com')
     end
-    context 'correct username and password' do
+    context 'correct uid and password' do
       before do
         params[:password] = 'password'
         create(:password_identity)
@@ -52,7 +52,7 @@ describe Identities::Password do
         Identities::Password.authenticate(controller).should be_instance_of Identities::Password
       end
     end
-    context 'incorrect username bad password' do
+    context 'incorrect uid bad password' do
       before do
         params[:password] = 'bad'
         create(:password_identity)
@@ -61,8 +61,8 @@ describe Identities::Password do
         Identities::Password.authenticate(controller).should be_false
       end
     end
-    context 'bad username and password' do
-      before { params.merge!(:username => 'bad@example.com', :password => 'bad') }
+    context 'bad uid and password' do
+      before { params.merge!(:uid => 'bad@example.com', :password => 'bad') }
       it 'returns nil' do
         Identities::Password.authenticate(controller).should be_nil
       end

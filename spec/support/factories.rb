@@ -7,7 +7,7 @@ FactoryGirl.define do
   end
 
   factory :password_identity, :class => Identities::Password do
-    username              'test@example.com'
+    uid                   'test@example.com'
     password              'password'
     password_confirmation 'password'
   end

@@ -1,7 +1,7 @@
 <%= form_for @identity, :url => main_app.sign_in_path do |f| %>
   <p>
-    <%= f.label :username, 'Username or Email' %>
-    <%= f.text_field :username %>
+    <%= f.label :uid, 'Username or Email' %>
+    <%= f.text_field :uid %>
   </p>
   <p>
     <%= f.label :password %>

@@ -18,19 +18,19 @@ describe EasyAuth::Password::Models::Account do
   it 'provides a method to the password identity' do
     user = User.create(:email => 'test@example.com', :username => 'testuser', :password => 'password', :password_confirmation => 'password')
     user.password_identities.count.should eq 2
-    user.password_identities.first.username.should eq 'test@example.com'
-    user.password_identities.last.username.should  eq 'testuser'
+    user.password_identities.first.uid.should eq 'test@example.com'
+    user.password_identities.last.uid.should  eq 'testuser'
   end
 
   it 'updates the proper password identity' do
     user = User.create(:email => 'test@example.com', :username => 'testuser', :password => 'password', :password_confirmation => 'password')
     user.reload
     user.update_attribute(:username, 'testuser2')
-    user.password_identities.last.username.should eq 'testuser2'
+    user.password_identities.last.uid.should eq 'testuser2'
   end
 
   context 'username' do
-    context '.identity_username_attributes' do
+    context '.identity_uid_attributes' do
       before do
         class TestUser; end
         TestUser.stubs(:has_many)
@@ -52,7 +52,7 @@ describe EasyAuth::Password::Models::Account do
         end
 
         it 'relies upon username' do
-          TestUser.identity_username_attributes.should eq [:username]
+          TestUser.identity_uid_attributes.should eq [:username]
         end
       end
 
@@ -63,7 +63,7 @@ describe EasyAuth::Password::Models::Account do
         end
 
         it 'relies upon username' do
-          TestUser.identity_username_attributes.should eq [:email]
+          TestUser.identity_uid_attributes.should eq [:email]
         end
       end
 
@@ -74,7 +74,7 @@ describe EasyAuth::Password::Models::Account do
         end
 
         it 'relies upon bosth username and password' do
-          TestUser.identity_username_attributes.should eq [:email, :username]
+          TestUser.identity_uid_attributes.should eq [:email, :username]
         end
       end
 
@@ -86,8 +86,8 @@ describe EasyAuth::Password::Models::Account do
         it 'raises an Exception as no appropriate identity username attribute is available' do
           lambda {
             TestUser.send(:include, EasyAuth::Models::Account)
-            TestUser.identity_username_attributes
-          }.should raise_exception(EasyAuth::Password::Models::Account::NoIdentityUsernameError)
+            TestUser.identity_uid_attributes
+          }.should raise_exception(EasyAuth::Password::Models::Account::NoIdentityUIDError)
         end
       end
     end

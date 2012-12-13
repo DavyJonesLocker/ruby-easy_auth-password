@@ -1,6 +1,6 @@
 module EasyAuth::Password::Models::Account
   extend EasyAuth::ReverseConcern
-  class  NoIdentityUsernameError < StandardError; end
+  class  NoIdentityUIDError < StandardError; end
 
   reverse_included do
     # Attributes
@@ -9,7 +9,7 @@ module EasyAuth::Password::Models::Account
 
     # Validations
     validates :password, :presence => { :on => :create, :if => :run_password_identity_validations? }, :confirmation => true
-    identity_username_attributes.each do |attribute|
+    identity_uid_attributes.each do |attribute|
       validates attribute, :presence => true, :if => :run_password_identity_validations?
     end
 
@@ -22,26 +22,26 @@ module EasyAuth::Password::Models::Account
   end
 
   module ClassMethods
-    # Will attempt to find the username attributes of :username and :email
+    # Will attempt to find the uid attributes of :username and :email
     # Will return an array of any defined on the model
     # If neither are defined an exception will be raised
     #
     # Override this method with an array of symbols for custom attributes
     #
     # @return [Symbol]
-    def identity_username_attributes
+    def identity_uid_attributes
       attributes = (['email', 'username'] & column_names).map(&:to_sym)
 
       if attributes.empty?
-        raise EasyAuth::Password::Models::Account::NoIdentityUsernameError, 'your model must have either a #username or #email attribute. Or you must override the .identity_username_attribute class method'
+        raise EasyAuth::Password::Models::Account::NoIdentityUIDError, 'your model must have either a #username or #email attribute. Or you must override the .identity_uid_attribute class method'
       else
         attributes
       end
     end
   end
 
-  def identity_username_attributes
-    self.class.identity_username_attributes
+  def identity_uid_attributes
+    self.class.identity_uid_attributes
   end
 
   def run_password_identity_validations?
@@ -51,23 +51,23 @@ module EasyAuth::Password::Models::Account
   private
 
   def setup_password_identities
-    identity_username_attributes.each do |attribute|
+    identity_uid_attributes.each do |attribute|
       self.identities << EasyAuth.find_identity_model(:identity => :password).new(password_identity_attributes(attribute))
     end
   end
 
   def update_password_identities
-    identity_username_attributes.each do |attribute|
+    identity_uid_attributes.each do |attribute|
       if send("#{attribute}_changed?")
-        identity = password_identities.find { |identity| identity.username == send("#{attribute}_was") }
+        identity = password_identities.find { |identity| identity.uid == send("#{attribute}_was") }
       else
-        identity = password_identities.find { |identity| identity.username == send(attribute) }
+        identity = password_identities.find { |identity| identity.uid == send(attribute) }
       end
       identity.update_attributes(password_identity_attributes(attribute))
     end
   end
 
   def password_identity_attributes(attribute)
-    { :username => send(attribute), :password => self.password, :password_confirmation => self.password_confirmation }
+    { :uid => send(attribute), :password => self.password, :password_confirmation => self.password_confirmation }
   end
 end
