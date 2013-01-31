@@ -9,3 +9,4 @@ bundler_stubs/*
 *.lock
 bin/*
 spec/dummy/config/initializers/_environment.rb
+*.swp
