@@ -4,17 +4,17 @@ module EasyAuth::Password::Models::Account
 
   reverse_included do
     # Attributes
-    attr_accessor   :password
+    attr_reader     :password
+    attr_accessor   :password_reset
     attr_accessible :password, :password_confirmation
 
     # Validations
-    validates :password, :presence => { :on => :create, :if => :run_password_identity_validations? }, :confirmation => true
+    validates :password, :presence => { :if => :password_reset }, :confirmation => true
     identity_uid_attributes.each do |attribute|
       validates attribute, :presence => true, :if => :run_password_identity_validations?
     end
 
     # Callbacks
-    before_create :setup_password_identities,  :if => :run_password_identity_validations?
     before_update :update_password_identities, :if => :run_password_identity_validations?
 
     # Associations
@@ -45,15 +45,18 @@ module EasyAuth::Password::Models::Account
   end
 
   def run_password_identity_validations?
-    (self.new_record? && self.password.present?) || self.password_identities.present?
+    self.password.present? || self.password_identities.present?
+  end
+
+  def password=(password)
+    @password = password
+    update_password_identities
   end
 
   private
 
-  def setup_password_identities
-    identity_uid_attributes.each do |attribute|
-      self.identities << EasyAuth.find_identity_model(:identity => :password).new(password_identity_attributes(attribute))
-    end
+  def build_password_identity_for_uid(uid)
+    self.identities << EasyAuth.find_identity_model(:identity => :password).new(password_identity_attributes(uid))
   end
 
   def update_password_identities
@@ -63,11 +66,16 @@ module EasyAuth::Password::Models::Account
       else
         identity = password_identities.find { |identity| identity.uid == send(attribute) }
       end
-      identity.update_attributes(password_identity_attributes(attribute))
+
+      if identity
+        identity.update_attributes(password_identity_attributes(attribute))
+      else
+        build_password_identity_for_uid(attribute)
+      end
     end
   end
 
   def password_identity_attributes(attribute)
-    { :uid => send(attribute), :password => self.password, :password_confirmation => self.password_confirmation }
+    { :uid => send(attribute), :password => self.password }
   end
 end

@@ -3,11 +3,9 @@ module EasyAuth::Models::Identities::Password
   extend EasyAuth::ReverseConcern
 
   reverse_included do
-    has_secure_password
-
     # Attributes
-    attr_accessor   :password_reset
-    attr_accessible :uid, :password, :password_confirmation, :remember
+    attr_reader     :password
+    attr_accessible :uid, :password, :remember
     alias_attribute :password_digest, :token
 
     # Relationships
@@ -15,8 +13,7 @@ module EasyAuth::Models::Identities::Password
 
     # Validations
     validates :uid, :uniqueness => { :case_sensitive => false }, :presence => true
-    validates :password, :presence => { :on => :create }
-    validates :password, :presence => { :if => :password_reset }
+    validates :password_digest, :presence => true
   end
 
   module ClassMethods
@@ -55,6 +52,13 @@ module EasyAuth::Models::Identities::Password
 
   def authenticate(unencrypted_token, token_name = :password)
     BCrypt::Password.new(send("#{token_name}_digest")) == unencrypted_token && self
+  end
+
+  def password=(unencrypted_password)
+    @password = unencrypted_password
+    unless unencrypted_password.blank?
+      self.password_digest = BCrypt::Password.create(unencrypted_password)
+    end
   end
 
   def generate_reset_token!

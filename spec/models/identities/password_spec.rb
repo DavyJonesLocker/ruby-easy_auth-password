@@ -8,35 +8,13 @@ describe Identities::Password do
     controller
   end
 
+  it { should     have_valid(:password_digest).when('password_digest') }
+  it { should_not have_valid(:password_digest).when(nil, '') }
+
   describe 'username' do
     before { create(:password_identity) }
     it { should     have_valid(:uid).when('another_test@example.com') }
     it { should_not have_valid(:uid).when('test@example.com', 'TEST@EXAMPLE.COM', nil, '') }
-  end
-
-  describe 'password' do
-    context 'new record' do
-      it { should     have_valid(:password).when('password') }
-      it { should_not have_valid(:password).when(nil, '') }
-    end
-
-    context 'existing record' do
-      subject do
-        create(:password_identity)
-        Identities::Password.last
-      end
-      it { should have_valid(:password).when('password', nil, '') }
-    end
-
-    context 'password reset' do
-      subject do
-        create(:password_identity)
-        identity = Identities::Password.last
-        identity.password_reset = true
-        identity
-      end
-      it { should_not have_valid(:password).when(nil, '') }
-    end
   end
 
   describe '.authenticate' do

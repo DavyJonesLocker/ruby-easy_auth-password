@@ -11,12 +11,35 @@ describe EasyAuth::Password::Models::Account do
     user.valid?.should be_false
   end
 
+  it 'creates password identities when account is already created and password is set after create' do
+    user = User.create(:email => 'test@example.com', :username => 'testuser')
+    user.password_identities.should be_empty
+    user.password = user.password_confirmation = 'password'
+    user.save
+    user.password_identities.reload
+    user.password_identities.should_not be_empty
+  end
+
+  it 'creates the missing password identity when account is already created and password is set after create' do
+    user = User.create(:email => 'test@example.com', :username => 'testuser')
+    user.password_identities.create(:password => 'password1', :uid => 'test@example.com')
+    user.password_identities.count.should eq 1
+    user.password = user.password_confirmation = 'password2'
+    user.save
+    user.password_identities.reload
+    user.password_identities.count.should eq 2
+    password_identities = user.password_identities
+    password_identities.first.authenticate('password2').should_not be_nil
+    password_identities.last.authenticate('password2').should_not be_nil
+  end
+
   it 'does not skip identity validations if new record with password' do
     User.new(:password => 'test').valid?.should be_false
   end
 
   it 'provides a method to the password identity' do
     user = User.create(:email => 'test@example.com', :username => 'testuser', :password => 'password', :password_confirmation => 'password')
+    user.password_identities.reload
     user.password_identities.count.should eq 2
     user.password_identities.first.uid.should eq 'test@example.com'
     user.password_identities.last.uid.should  eq 'testuser'

@@ -1,7 +1,7 @@
 module EasyAuth::Controllers::PasswordReset
   def self.included(base)
     base.instance_eval do
-      before_filter :find_identity_from_reset_token, :only => [:edit, :update]
+      before_filter :find_account_from_reset_token, :only => [:edit, :update]
     end
   end
 
@@ -22,26 +22,22 @@ module EasyAuth::Controllers::PasswordReset
   end
 
   def update
-    if @identity.update_attributes(scope_to_password_params(:identities_password))
-      after_successful_password_reset(@identity)
+    if @account.update_attributes(params[ActiveModel::Naming.param_key(@account)])
+      after_successful_password_reset(@account.password_identities.first)
     else
-      after_failed_password_reset(@identity)
+      after_failed_password_reset(@account.password_identities.first)
     end
   end
 
   private
 
-  def find_identity_from_reset_token
-    if @identity = EasyAuth.find_identity_model(params).authenticate(self, :reset_token)
-      @identity.password_reset = true
+  def find_account_from_reset_token
+    if @account = EasyAuth.find_identity_model(params).authenticate(self, :reset_token).try(:account)
+      @account.password_reset = true
     else
       flash[:error] = I18n.t('easy_auth.password_reset.edit.error')
       redirect_to root_path
     end
-  end
-
-  def scope_to_password_params(key)
-    { :password => params[key][:password], :password_confirmation => params[key][:password_confirmation] }
   end
 
   def after_successful_password_reset(identity)
