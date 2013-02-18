@@ -17,6 +17,12 @@ gem 'easy_auth-password'
 Then follow the general installation instructions for
 [EasyAuth](https://github.com/dockyard/easy_auth#installation)
 
+Then add the migration:
+
+```bash
+rake easy_auth_password:install:migrations
+```
+
 ## Usage ##
 
 `EasyAuth-Password` will handle most of what you want automatically. 
