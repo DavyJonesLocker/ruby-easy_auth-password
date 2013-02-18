@@ -18,7 +18,7 @@ module EasyAuth::Password::Models::Identity
   # @return [String]
   def generate_remember_token_digest!
     remember_token = _generate_token(:remember)
-    update_column(:remember_token_digest, BCrypt::Password.create(remember_token))
+    update_column(:remember_token_digest, SCrypt::Password.create(remember_token))
     remember_token
   end
 

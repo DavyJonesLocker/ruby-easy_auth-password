@@ -59,7 +59,7 @@ describe Identities::Password do
       unencrypted_token = identity.generate_reset_token!
       identity = Identities::Password.last
       identity.reset_token_digest.should_not be_nil
-      BCrypt::Password.new(identity.reset_token_digest).should eq unencrypted_token
+      SCrypt::Password.new(identity.reset_token_digest).should eq unencrypted_token
     end
   end
 end
