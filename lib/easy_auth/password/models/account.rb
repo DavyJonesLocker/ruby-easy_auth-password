@@ -6,7 +6,6 @@ module EasyAuth::Password::Models::Account
     # Attributes
     attr_reader     :password
     attr_accessor   :password_reset
-    attr_accessible :password, :password_confirmation
 
     # Validations
     validates :password, :presence => { :if => :password_reset }, :confirmation => true
