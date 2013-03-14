@@ -7,7 +7,6 @@ module EasyAuth::Models::Identities::Password
   reverse_included do
     # Attributes
     attr_reader     :password
-    attr_accessible :uid, :password, :remember
     alias_attribute :password_digest, :token
 
     # Relationships

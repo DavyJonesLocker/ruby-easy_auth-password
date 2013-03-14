@@ -61,7 +61,6 @@ describe EasyAuth::Password::Models::Account do
         TestUser.stubs(:before_create)
         TestUser.stubs(:before_update)
         TestUser.stubs(:validates)
-        TestUser.stubs(:attr_accessible)
       end
 
       after do
