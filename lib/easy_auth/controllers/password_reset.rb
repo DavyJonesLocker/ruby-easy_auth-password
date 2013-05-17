@@ -22,7 +22,7 @@ module EasyAuth::Controllers::PasswordReset
   end
 
   def update
-    if @account.update_attributes(params[ActiveModel::Naming.param_key(@account)])
+    if @account.update_attributes(account_params)
       after_successful_password_reset(@account.password_identities.first)
     else
       after_failed_password_reset(@account.password_identities.first)
@@ -30,6 +30,10 @@ module EasyAuth::Controllers::PasswordReset
   end
 
   private
+
+  def account_params
+    params[ActiveModel::Naming.param_key(@account)]
+  end
 
   def find_account_from_reset_token
     if @account = EasyAuth.find_identity_model(params).authenticate(self, :reset_token).try(:account)
