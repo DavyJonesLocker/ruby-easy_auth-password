@@ -17,7 +17,7 @@ module EasyAuth::Password::Models::Account
     before_update :update_password_identities, :if => :run_password_identity_validations?
 
     # Associations
-    has_many :password_identities, :class_name => 'Identities::Password', :foreign_key => :account_id
+    has_many :password_identities, :class_name => 'Identities::Password', :as => :account
   end
 
   module ClassMethods
