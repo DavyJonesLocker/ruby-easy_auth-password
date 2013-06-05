@@ -14,7 +14,8 @@ module EasyAuth::Password::Models::Account
     end
 
     # Callbacks
-    before_update :update_password_identities, :if => :run_password_identity_validations?
+    #before_update :update_password_identities, :if => :run_password_identity_validations?
+    before_save :update_password_identities, :if => :can_update_password_identities?
 
     # Associations
     has_many :password_identities, :class_name => 'Identities::Password', :as => :account
@@ -47,12 +48,16 @@ module EasyAuth::Password::Models::Account
     self.password.present? || self.password_identities.present?
   end
 
-  def password=(password)
-    @password = password
-    update_password_identities
-  end
+  #def password=(password)
+    #@password = password
+    #update_password_identities
+  #end
 
   private
+
+  def can_update_password_identities?
+    password.present? || identity_uid_attributes.detect { |attribute| send("#{attribute}_changed?") }
+  end
 
   def build_password_identity_for_uid(uid)
     self.identities << EasyAuth.find_identity_model(:identity => :password).new(password_identity_attributes(uid))
