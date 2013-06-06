@@ -16,7 +16,6 @@ describe EasyAuth::Password::Models::Account do
     user.password_identities.should be_empty
     user.password = user.password_confirmation = 'password'
     user.save
-    user.password_identities.reload
     user.password_identities.should_not be_empty
   end
 
@@ -26,7 +25,6 @@ describe EasyAuth::Password::Models::Account do
     user.password_identities.count.should eq 1
     user.password = user.password_confirmation = 'password2'
     user.save
-    user.password_identities.reload
     user.password_identities.count.should eq 2
     password_identities = user.password_identities
     password_identities.first.authenticate('password2').should_not be_nil
@@ -39,7 +37,7 @@ describe EasyAuth::Password::Models::Account do
 
   it 'provides a method to the password identity' do
     user = User.create(:email => 'test@example.com', :username => 'testuser', :password => 'password', :password_confirmation => 'password')
-    user.password_identities.reload
+    user.reload
     user.password_identities.count.should eq 2
     user.password_identities.first.uid.should eq 'test@example.com'
     user.password_identities.last.uid.should  eq 'testuser'
@@ -47,9 +45,11 @@ describe EasyAuth::Password::Models::Account do
 
   it 'updates the proper password identity' do
     user = User.create(:email => 'test@example.com', :username => 'testuser', :password => 'password', :password_confirmation => 'password')
-    user.reload
+    user = User.last
+
     user.update_attribute(:username, 'testuser2')
     user.password_identities.last.uid.should eq 'testuser2'
+    user.password_identities.last.authenticate('password').should_not be_nil
   end
 
   context 'username' do
@@ -59,7 +59,7 @@ describe EasyAuth::Password::Models::Account do
         TestUser.stubs(:has_many)
         TestUser.stubs(:has_one)
         TestUser.stubs(:before_create)
-        TestUser.stubs(:before_update)
+        TestUser.stubs(:before_save)
         TestUser.stubs(:validates)
       end
 
