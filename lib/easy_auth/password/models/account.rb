@@ -4,8 +4,7 @@ module EasyAuth::Password::Models::Account
 
   reverse_included do
     # Attributes
-    attr_reader     :password
-    attr_accessor   :password_reset
+    attr_accessor   :password_reset, :password
 
     # Validations
     validates :password, :presence => { :if => :password_reset }, :confirmation => true
@@ -56,7 +55,7 @@ module EasyAuth::Password::Models::Account
   private
 
   def can_update_password_identities?
-    password.present? || identity_uid_attributes.detect { |attribute| send("#{attribute}_changed?") }
+    password.present? || identity_uid_attributes.detect { |attribute| send("#{attribute}_changed?") && password_identities.where(:uid => send("#{attribute}_was")).first }
   end
 
   def build_password_identity_for_uid(uid)
@@ -77,6 +76,7 @@ module EasyAuth::Password::Models::Account
         build_password_identity_for_uid(attribute)
       end
     end
+    password_identities.reload
   end
 
   def password_identity_attributes(attribute)
