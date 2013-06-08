@@ -2,9 +2,9 @@ require 'scrypt'
 
 module EasyAuth::Models::Identities::Password
   include EasyAuth::TokenGenerator
-  extend EasyAuth::ReverseConcern
+  extend ActiveSupport::Concern
 
-  reverse_included do
+  prepended do
     # Attributes
     attr_reader     :password
     alias_attribute :password_digest, :token

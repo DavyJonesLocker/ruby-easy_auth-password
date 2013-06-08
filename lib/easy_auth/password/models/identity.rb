@@ -1,5 +1,5 @@
 module EasyAuth::Password::Models::Identity
-  extend EasyAuth::ReverseConcern
+  extend ActiveSupport::Concern
 
   # Getter for the remember flag
   def remember

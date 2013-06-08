@@ -1,7 +1,7 @@
 module EasyAuth::Password::Helpers::EasyAuth
-  extend EasyAuth::ReverseConcern
+  extend ActiveSupport::Concern
 
-  reverse_included do
+  prepended do
     def current_account
       super
 

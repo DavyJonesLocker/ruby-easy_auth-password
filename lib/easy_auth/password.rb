@@ -16,13 +16,13 @@ module EasyAuth
     autoload :PasswordReset
 
     module Sessions
-      include EasyAuth::Password::Controllers::Sessions
+      prepend EasyAuth::Password::Controllers::Sessions
     end
   end
 
   module Helpers
     module EasyAuth
-      include ::EasyAuth::Password::Helpers::EasyAuth
+      prepend ::EasyAuth::Password::Helpers::EasyAuth
     end
   end
 
@@ -32,10 +32,10 @@ module EasyAuth
 
   module Models
     module Account
-      include EasyAuth::Password::Models::Account
+      prepend EasyAuth::Password::Models::Account
     end
     module Identity
-      include EasyAuth::Password::Models::Identity
+      prepend EasyAuth::Password::Models::Identity
     end
 
     module Identities

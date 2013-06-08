@@ -1,8 +1,8 @@
 module EasyAuth::Password::Models::Account
-  extend EasyAuth::ReverseConcern
+  extend ActiveSupport::Concern
   class  NoIdentityUIDError < StandardError; end
 
-  reverse_included do
+  prepended do
     # Attributes
     attr_accessor   :password_reset, :password
 

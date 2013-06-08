@@ -1,7 +1,7 @@
 module EasyAuth::Password::Controllers::Sessions
-  extend EasyAuth::ReverseConcern
+  extend ActiveSupport::Concern
 
-  reverse_included do
+  prepended do
     before_filter :no_authentication, :only => :new, :if => Proc.new { params[:identity] == 'password' }
 
     def create
