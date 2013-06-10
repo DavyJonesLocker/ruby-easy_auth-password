@@ -34,6 +34,7 @@ module EasyAuth
     module Account
       prepend EasyAuth::Password::Models::Account
     end
+
     module Identity
       prepend EasyAuth::Password::Models::Identity
     end

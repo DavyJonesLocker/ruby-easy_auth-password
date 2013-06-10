@@ -4,7 +4,7 @@ module EasyAuth::Models::Identities::Password
   include EasyAuth::TokenGenerator
   extend ActiveSupport::Concern
 
-  prepended do
+  included do
     # Attributes
     attr_reader     :password
     alias_attribute :password_digest, :token

@@ -1,14 +1,14 @@
 require 'rubygems'
-begin
-  require 'debugger'
-rescue LoadError
-end
-begin
-  require 'ruby-debug'
-rescue LoadError
-end
+# begin
+  # require 'debugger'
+# rescue LoadError
+# end
+# begin
+  # require 'ruby-debug'
+# rescue LoadError
+# end
 require 'bundler/setup'
-
+require 'byebug'
 ENV['RAILS_ENV'] = 'test'
 require File.expand_path('../dummy/config/environment.rb',  __FILE__)
 require 'capybara/rspec'
@@ -24,7 +24,7 @@ Dir[File.join(ENGINE_RAILS_ROOT, 'spec/config/**/*.rb')].each { |f| require f }
 
 RSpec.configure do |config|
   config.mock_with :mocha
-  config.use_transactional_fixtures = true
+  config.use_transactional_fixtures = false
   config.include Factory::Syntax::Methods
 
   config.before(:each, :type => :request) do
@@ -32,3 +32,6 @@ RSpec.configure do |config|
   end
 end
 
+module Kernel
+  alias debugger byebug
+end

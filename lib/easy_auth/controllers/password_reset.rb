@@ -32,7 +32,7 @@ module EasyAuth::Controllers::PasswordReset
   private
 
   def account_params
-    params[ActiveModel::Naming.param_key(@account)]
+    params.require(ActiveModel::Naming.param_key(@account)).permit(:password, :password_confirmation)
   end
 
   def find_account_from_reset_token

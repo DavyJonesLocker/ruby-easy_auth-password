@@ -4,7 +4,7 @@ module EasyAuth::Password::Models::Account
 
   prepended do
     # Attributes
-    attr_accessor   :password_reset, :password
+    attr_accessor :password, :password_reset
 
     # Validations
     validates :password, :presence => { :if => :password_reset }, :confirmation => true
@@ -13,7 +13,6 @@ module EasyAuth::Password::Models::Account
     end
 
     # Callbacks
-    #before_update :update_password_identities, :if => :run_password_identity_validations?
     before_save :update_password_identities, :if => :can_update_password_identities?
 
     # Associations
@@ -46,11 +45,6 @@ module EasyAuth::Password::Models::Account
   def run_password_identity_validations?
     self.password.present? || self.password_identities.present?
   end
-
-  #def password=(password)
-    #@password = password
-    #update_password_identities
-  #end
 
   private
 
