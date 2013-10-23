@@ -13,8 +13,8 @@ describe Identities::Password do
 
   describe 'username' do
     before { create(:password_identity) }
-    it { should     have_valid(:uid).when('another_test@example.com') }
-    it { should_not have_valid(:uid).when('test@example.com', 'TEST@EXAMPLE.COM', nil, '') }
+    it { should     have_valid(:uid).when(['another_test@example.com']) }
+    it { should_not have_valid(:uid).when(['test@example.com'], ['TEST@EXAMPLE.COM'], []) }
   end
 
   describe '.authenticate' do

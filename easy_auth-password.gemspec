@@ -13,11 +13,11 @@ Gem::Specification.new do |s|
 
   s.files = Dir['{app,config,db,lib}/**/*'] + ['Rakefile', 'README.md']
 
-  s.add_dependency 'easy_auth', '~> 0.3.0'
+  s.add_dependency 'easy_auth', '~> 0.4.0'
   s.add_dependency 'scrypt'
 
-  s.add_development_dependency 'sqlite3'
-  s.add_development_dependency 'rspec-rails', '~> 2.11.4'
+  s.add_development_dependency 'pg'
+  s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'capybara', '~> 2.1'
   s.add_development_dependency 'capybara-email', '~> 2.1.2'
   s.add_development_dependency 'database_cleaner'

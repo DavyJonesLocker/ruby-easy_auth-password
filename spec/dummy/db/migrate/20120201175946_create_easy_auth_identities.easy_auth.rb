@@ -2,7 +2,7 @@
 class CreateEasyAuthIdentities < ActiveRecord::Migration
   def change
     create_table :identities do |t|
-      t.string  :uid
+      t.string  :uid, array: true, default: []
       t.string  :token
       t.string  :account_type
       t.integer :account_id
