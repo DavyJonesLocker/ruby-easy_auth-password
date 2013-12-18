@@ -65,7 +65,7 @@ module EasyAuth::Password::Models::Account
       if index = password_identity.uid.index(send("#{attribute}_was"))
         password_identity.uid[index] = send(attribute)
       else
-        password_identity.uid << send(attribute)
+        password_identity.uid << send(attribute).downcase
       end
 
       password_identity.uid_will_change!
