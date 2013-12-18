@@ -72,5 +72,7 @@ module EasyAuth::Password::Models::Account
     end
 
     password_identity.password = self.password
+
+    password_identity
   end
 end
