@@ -22,10 +22,12 @@ module EasyAuth::Controllers::PasswordReset
   end
 
   def update
+    @identity = @account.password_identity
+
     if @account.update_attributes(account_params)
-      after_successful_password_reset(@account.password_identity)
+      after_successful_password_reset
     else
-      after_failed_password_reset(@account.password_identity)
+      after_failed_password_reset
     end
   end
 
@@ -44,17 +46,17 @@ module EasyAuth::Controllers::PasswordReset
     end
   end
 
-  def after_successful_password_reset(identity)
-    session[:identity_id] = identity.id
-    identity.update_column(:reset_token_digest, nil)
-    redirect_to after_successful_password_reset_url(identity), :notice => I18n.t('easy_auth.password_reset.update.notice')
+  def after_successful_password_reset
+    session[:identity_id] = @identity.id
+    @identity.update_column(:reset_token_digest, nil)
+    redirect_to after_successful_password_reset_url(@identity), :notice => I18n.t('easy_auth.password_reset.update.notice')
   end
 
-  def after_successful_password_reset_url(identity)
-    identity.account
+  def after_successful_password_reset_url
+    @identity.account
   end
 
-  def after_failed_password_reset(identity)
+  def after_failed_password_reset
     flash.now[:error] = I18n.t('easy_auth.password_reset.update.error')
     render :edit
   end
