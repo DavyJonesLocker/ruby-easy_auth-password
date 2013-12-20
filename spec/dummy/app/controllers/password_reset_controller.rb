@@ -3,7 +3,7 @@ class PasswordResetController < ApplicationController
 
   private
 
-  def after_successful_password_reset_url(identity)
+  def after_successful_password_reset_url
     main_app.dashboard_url
   end
 end
