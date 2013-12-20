@@ -14,7 +14,7 @@ module EasyAuth::Controllers::PasswordReset
       unencrypted_reset_token = @identity.generate_reset_token!
       PasswordResetMailer.reset(@identity.id, unencrypted_reset_token).deliver
     else
-      @identity = EasyAuth.find_identity_model(params).new(params[:identities_password])
+      @identity = EasyAuth.find_identity_model(params).new(uid: params[:identities_password][:uid])
     end
 
     flash.now[:notice] = I18n.t('easy_auth.password_reset.create.notice')

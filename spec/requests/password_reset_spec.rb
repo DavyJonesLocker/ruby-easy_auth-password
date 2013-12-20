@@ -34,4 +34,10 @@ feature 'Password reset' do
     click_button 'Submit'
     page.should have_content 'There was an issue updating your password.'
   end
+
+  scenario 'bad email' do
+    visit password_reset_path
+    click_button 'Submit'
+    page.should have_content 'Please check your email for your password reset link.'
+  end
 end
