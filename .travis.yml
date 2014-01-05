@@ -1,6 +1,7 @@
 rvm:
   - 2.0.0
-
+  - 2.1.0
+gemfile: Gemfile.ci
 before_script:
   - psql -c 'create database easy_auth_password_test;' -U postgres
   - bundle exec rake db:migrate

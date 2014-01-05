@@ -1,0 +1,17 @@
+source "http://rubygems.org"
+
+gem 'easy_auth', github: 'dockyard/easy_auth'
+gem 'scrypt'
+
+gem 'pg'
+gem 'rspec-rails'
+gem 'capybara', '~> 2.1'
+gem 'capybara-email', '~> 2.1.2'
+gem 'database_cleaner'
+gem 'valid_attribute'
+gem 'factory_girl_rails', '~> 1.7.0'
+gem 'factory_girl', '~> 2.6.0'
+gem 'mocha', '~> 0.10.5'
+gem 'launchy'
+gem "jquery-rails"
+gem 'byebug'
