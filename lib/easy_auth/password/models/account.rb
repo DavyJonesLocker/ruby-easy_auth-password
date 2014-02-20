@@ -56,10 +56,6 @@ module EasyAuth::Password::Models::Account
     password.present? || identity_uid_attributes.detect { |attribute| send("#{attribute}_changed?") && password_identities.where(:uid => send("#{attribute}_was")).first }
   end
 
-  def build_password_identity_for_uid(uid)
-    self.identities << EasyAuth.find_identity_model(:identity => :password).new(password_identity_attributes(uid))
-  end
-
   def update_password_identities
     identity_uid_attributes.each do |attribute|
       if send("#{attribute}_changed?")
@@ -71,10 +67,9 @@ module EasyAuth::Password::Models::Account
       if identity
         identity.update_attributes(password_identity_attributes(attribute))
       else
-        build_password_identity_for_uid(attribute)
+        self.password_identities.build(password_identity_attributes(attribute))
       end
     end
-    password_identities.reload
   end
 
   def password_identity_attributes(attribute)
