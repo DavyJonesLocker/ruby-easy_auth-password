@@ -9,12 +9,11 @@ module EasyAuth::Models::Identities::Password
     attr_reader     :password
     alias_attribute :password_digest, :token
 
-    # Relationships
-    belongs_to :account, :polymorphic => true
-
     # Validations
-    validates :uid, :uniqueness => { :case_sensitive => false }, :presence => true
-    validates :password_digest, :presence => true
+    _validators[:uid].delete_at(_validators[:uid].index { |v| v.instance_of?(ActiveRecord::Validations::UniquenessValidator) })
+    _validators[:token].delete_at(_validators[:token].index { |v| v.instance_of?(ActiveRecord::Validations::PresenceValidator) })
+    validates :uid, uniqueness: { case_sensitive: false }
+    validates :password_digest, presence: true
   end
 
   module ClassMethods
