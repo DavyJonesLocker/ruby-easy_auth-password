@@ -13,7 +13,7 @@ module EasyAuth::Models::Identities::Password
     belongs_to :account, :polymorphic => true
 
     # Validations
-    validates :uid, array_uniqueness: true, presence: true
+    validates :uid, :uniqueness => { :case_sensitive => false }, :presence => true
     validates :password_digest, :presence => true
   end
 
@@ -39,7 +39,7 @@ module EasyAuth::Models::Identities::Password
     end
 
     def conditions_for_password(attributes)
-      arel_table[:uid].contains(Array.wrap(attributes[:uid].try(&:strip).downcase))
+      arel_table[:uid].matches(attributes[:uid].try(&:strip))
     end
 
     def conditions_for_reset_token(attributes)
@@ -66,9 +66,5 @@ module EasyAuth::Models::Identities::Password
     unencrypted_token = _generate_token(:reset_token)
     update_column(:reset_token_digest, SCrypt::Password.create(unencrypted_token))
     unencrypted_token
-  end
-
-  def uid=(uid)
-    send(:write_attribute, :uid, Array.wrap(uid).map(&:downcase))
   end
 end
