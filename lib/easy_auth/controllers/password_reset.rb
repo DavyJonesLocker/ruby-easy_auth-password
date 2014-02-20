@@ -22,12 +22,12 @@ module EasyAuth::Controllers::PasswordReset
   end
 
   def update
-    @identity = @account.password_identity
+    @identity = @account.password_identities.first
 
     if @account.update_attributes(account_params)
-      after_successful_password_reset(@account.password_identities.first)
+      after_successful_password_reset
     else
-      after_failed_password_reset(@account.password_identities.first)
+      after_failed_password_reset
     end
   end
 

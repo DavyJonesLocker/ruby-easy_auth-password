@@ -67,42 +67,48 @@ describe EasyAuth::Password::Models::Account do
         Object.send(:remove_const, :TestUser)
       end
 
-      context 'when only username is defined' do
+      context 'when table exists' do
         before do
-          TestUser.stubs(:column_names).returns(['username'])
-          TestUser.instance_eval { include(EasyAuth::Models::Account) }
+          TestUser.stubs(:table_exists?).returns(true)
         end
 
-        it 'relies upon username' do
-          TestUser.identity_uid_attributes.should eq [:username]
+        context 'when only username is defined' do
+          before do
+            TestUser.stubs(:column_names).returns(['username'])
+            TestUser.instance_eval { include(EasyAuth::Models::Account) }
+          end
+
+          it 'relies upon username' do
+            TestUser.identity_uid_attributes.should eq [:username]
+          end
+        end
+
+        context 'when only email is defined' do
+          before do
+            TestUser.stubs(:column_names).returns(['email'])
+            TestUser.instance_eval { include(EasyAuth::Models::Account) }
+          end
+
+          it 'relies upon username' do
+            TestUser.identity_uid_attributes.should eq [:email]
+          end
+        end
+
+        context 'when both username and email are defined' do
+          before do
+            TestUser.stubs(:column_names).returns(['email', 'username'])
+            TestUser.instance_eval { include(EasyAuth::Models::Account) }
+          end
+
+          it 'relies upon bosth username and password' do
+            TestUser.identity_uid_attributes.should eq [:email, :username]
+          end
         end
       end
 
-      context 'when only email is defined' do
+      context 'when no table exists' do
         before do
-          TestUser.stubs(:column_names).returns(['email'])
-          TestUser.instance_eval { include(EasyAuth::Models::Account) }
-        end
-
-        it 'relies upon username' do
-          TestUser.identity_uid_attributes.should eq [:email]
-        end
-      end
-
-      context 'when both username and email are defined' do
-        before do
-          TestUser.stubs(:column_names).returns(['email', 'username'])
-          TestUser.instance_eval { include(EasyAuth::Models::Account) }
-        end
-
-        it 'relies upon bosth username and password' do
-          TestUser.identity_uid_attributes.should eq [:email, :username]
-        end
-      end
-
-      context 'when both username and email are not defined' do
-        before do
-          TestUser.stubs(:column_names).returns([])
+          TestUser.stubs(:table_exists?).returns(false)
         end
 
         it 'raises an Exception as no appropriate identity username attribute is available' do
