@@ -2,3 +2,4 @@
 
 * Forbidden attributes fix
 * After hooks for password reset no longer take arguments
+* Reverted array identities

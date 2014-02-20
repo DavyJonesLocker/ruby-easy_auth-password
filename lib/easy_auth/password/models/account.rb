@@ -13,10 +13,10 @@ module EasyAuth::Password::Models::Account
     end
 
     # Callbacks
-    before_save :update_password_identity, :if => :can_update_password_identity?
+    before_save :update_password_identities, :if => :can_update_password_identities?
 
     # Associations
-    has_one :password_identity, :class_name => 'Identities::Password', :as => :account, autosave: true
+    has_many :password_identities, :class_name => 'Identities::Password', :as => :account
   end
 
   module ClassMethods
@@ -47,32 +47,37 @@ module EasyAuth::Password::Models::Account
   end
 
   def run_password_identity_validations?
-    self.password.present? || self.password_identity.present?
+    self.password.present? || self.password_identities.present?
   end
 
   private
 
-  def can_update_password_identity?
-    password.present? || (password_identity.present? && identity_uid_attributes.find { |attribute| send("#{attribute}_changed?") })
+  def can_update_password_identities?
+    password.present? || identity_uid_attributes.detect { |attribute| send("#{attribute}_changed?") && password_identities.where(:uid => send("#{attribute}_was")).first }
   end
 
-  def update_password_identity
-    if password_identity.blank?
-      self.build_password_identity
-    end
+  def build_password_identity_for_uid(uid)
+    self.identities << EasyAuth.find_identity_model(:identity => :password).new(password_identity_attributes(uid))
+  end
 
+  def update_password_identities
     identity_uid_attributes.each do |attribute|
-      if index = password_identity.uid.index(send("#{attribute}_was"))
-        password_identity.uid[index] = send(attribute)
+      if send("#{attribute}_changed?")
+        identity = password_identities.find { |identity| identity.uid == send("#{attribute}_was") }
       else
-        password_identity.uid << send(attribute).downcase
+        identity = password_identities.find { |identity| identity.uid == send(attribute) }
       end
 
-      password_identity.uid_will_change!
+      if identity
+        identity.update_attributes(password_identity_attributes(attribute))
+      else
+        build_password_identity_for_uid(attribute)
+      end
     end
+    password_identities.reload
+  end
 
-    password_identity.password = self.password
-
-    password_identity
+  def password_identity_attributes(attribute)
+    { :uid => send(attribute), :password => self.password }
   end
 end

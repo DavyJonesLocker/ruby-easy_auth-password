@@ -7,7 +7,7 @@ FactoryGirl.define do
   end
 
   factory :password_identity, :class => Identities::Password do
-    uid                   ['test@example.com']
+    uid                   'test@example.com'
     password              'password'
   end
 end

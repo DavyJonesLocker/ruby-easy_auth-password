@@ -13,21 +13,22 @@ describe EasyAuth::Password::Models::Account do
 
   it 'creates password identities when account is already created and password is set after create' do
     user = User.create(:email => 'test@example.com', :username => 'testuser')
-    user.password_identity.should be_nil
+    user.password_identities.should be_empty
     user.password = user.password_confirmation = 'password'
     user.save
-    user = User.last
-    user.password_identity.should_not be_nil
+    user.password_identities.should_not be_empty
   end
 
   it 'creates the missing password identity when account is already created and password is set after create' do
     user = User.create(:email => 'test@example.com', :username => 'testuser')
-    user.password_identity.should be_nil
-    user.create_password_identity(:password => 'password1', :uid => ['test@example.com'])
+    user.password_identities.create(:password => 'password1', :uid => 'test@example.com')
+    user.password_identities.count.should eq 1
     user.password = user.password_confirmation = 'password2'
     user.save
-    user.password_identity.uid.should eq ['test@example.com', 'testuser']
-    user.password_identity.authenticate('password2').should_not be_nil
+    user.password_identities.count.should eq 2
+    password_identities = user.password_identities
+    password_identities.first.authenticate('password2').should_not be_nil
+    password_identities.last.authenticate('password2').should_not be_nil
   end
 
   it 'does not skip identity validations if new record with password' do
@@ -37,16 +38,18 @@ describe EasyAuth::Password::Models::Account do
   it 'provides a method to the password identity' do
     user = User.create(:email => 'test@example.com', :username => 'testuser', :password => 'password', :password_confirmation => 'password')
     user.reload
-    user.password_identity.uid.should eq ['test@example.com', 'testuser']
+    user.password_identities.count.should eq 2
+    user.password_identities.first.uid.should eq 'test@example.com'
+    user.password_identities.last.uid.should  eq 'testuser'
   end
 
   it 'updates the proper password identity' do
     user = User.create(:email => 'test@example.com', :username => 'testuser', :password => 'password', :password_confirmation => 'password')
-    # force a clean record reload after create
-    user = User.find(user.id)
+    user = User.last
 
     user.update_attribute(:username, 'testuser2')
-    user.password_identity.uid.should eq ['test@example.com', 'testuser2']
+    user.password_identities.last.uid.should eq 'testuser2'
+    user.password_identities.last.authenticate('password').should_not be_nil
   end
 
   context 'username' do
@@ -99,19 +102,6 @@ describe EasyAuth::Password::Models::Account do
 
           it 'relies upon bosth username and password' do
             TestUser.identity_uid_attributes.should eq [:email, :username]
-          end
-        end
-
-        context 'when both username and email are not defined' do
-          before do
-            TestUser.stubs(:column_names).returns([])
-          end
-
-          it 'raises an Exception as no appropriate identity username attribute is available' do
-            lambda {
-              TestUser.send(:include, EasyAuth::Models::Account)
-              TestUser.identity_uid_attributes
-            }.should raise_exception(EasyAuth::Password::Models::Account::NoIdentityUIDError)
           end
         end
       end
