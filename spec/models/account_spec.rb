@@ -61,6 +61,7 @@ describe EasyAuth::Password::Models::Account do
         TestUser.stubs(:before_create)
         TestUser.stubs(:before_save)
         TestUser.stubs(:validates)
+        TestUser.stubs(:accepts_nested_attributes_for)
       end
 
       after do
