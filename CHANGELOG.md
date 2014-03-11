@@ -6,3 +6,5 @@
 * Improved password identity updating
 * Don't double up on relationship definitions
 * Don't double up on validators
+* Extracted PasswordReset#create after actions 
+* Made PasswordReset after actions public

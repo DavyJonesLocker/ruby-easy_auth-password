@@ -13,12 +13,11 @@ module EasyAuth::Controllers::PasswordReset
     if @identity = EasyAuth.find_identity_model(params).where(:uid => params[:identities_password][:uid]).first
       unencrypted_reset_token = @identity.generate_reset_token!
       PasswordResetMailer.reset(@identity.id, unencrypted_reset_token).deliver
+      after_successful_attempted_password_reset
     else
       @identity = EasyAuth.find_identity_model(params).new(uid: params[:identities_password][:uid])
+      after_failed_attempted_password_reset
     end
-
-    flash.now[:notice] = I18n.t('easy_auth.password_reset.create.notice')
-    render :new
   end
 
   def update
@@ -28,21 +27,6 @@ module EasyAuth::Controllers::PasswordReset
       after_successful_password_reset
     else
       after_failed_password_reset
-    end
-  end
-
-  private
-
-  def account_params
-    params.require(ActiveModel::Naming.param_key(@account)).permit(:password, :password_confirmation)
-  end
-
-  def find_account_from_reset_token
-    if @account = EasyAuth.find_identity_model(params).authenticate(self, :reset_token).try(:account)
-      @account.password_reset = true
-    else
-      flash[:error] = I18n.t('easy_auth.password_reset.edit.error')
-      redirect_to root_path
     end
   end
 
@@ -59,5 +43,29 @@ module EasyAuth::Controllers::PasswordReset
   def after_failed_password_reset
     flash.now[:error] = I18n.t('easy_auth.password_reset.update.error')
     render :edit
+  end
+
+  def after_successful_attempted_password_reset
+    flash.now[:notice] = I18n.t('easy_auth.password_reset.create.notice')
+    render :new
+  end
+
+  def after_failed_attempted_password_reset
+    after_successful_attempted_password_reset
+  end
+
+  private
+
+  def account_params
+    params.require(ActiveModel::Naming.param_key(@account)).permit(:password, :password_confirmation)
+  end
+
+  def find_account_from_reset_token
+    if @account = EasyAuth.find_identity_model(params).authenticate(self, :reset_token).try(:account)
+      @account.password_reset = true
+    else
+      flash[:error] = I18n.t('easy_auth.password_reset.edit.error')
+      redirect_to root_path
+    end
   end
 end
