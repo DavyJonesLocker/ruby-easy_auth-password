@@ -53,15 +53,17 @@ module EasyAuth::Password::Models::Account
   private
 
   def can_update_password_identities?
-    password.present? || identity_uid_attributes.detect { |attribute| send("#{attribute}_changed?") && password_identities.where(:uid => send("#{attribute}_was")).first }
+    password.present? || identity_uid_attributes.detect do |attribute|
+      send("#{attribute}_changed?") && password_identities.where(password_identities.arel_table[:uid].matches(send("#{attribute}_was"))).first
+    end
   end
 
   def update_password_identities
     identity_uid_attributes.each do |attribute|
       if send("#{attribute}_changed?")
-        identity = password_identities.find { |identity| identity.uid == send("#{attribute}_was") }
+        identity = password_identities.find { |identity| identity.uid =~ match(send("#{attribute}_was")) }
       else
-        identity = password_identities.find { |identity| identity.uid == send(attribute) }
+        identity = password_identities.find { |identity| identity.uid =~ match(send(attribute)) }
       end
 
       if identity
@@ -74,5 +76,9 @@ module EasyAuth::Password::Models::Account
 
   def password_identity_attributes(attribute)
     { :uid => send(attribute), :password => self.password }
+  end
+
+  def match(value)
+    Regexp.new("\\A#{value}\\z", 'i')
   end
 end

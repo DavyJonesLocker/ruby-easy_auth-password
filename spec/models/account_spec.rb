@@ -27,8 +27,8 @@ describe EasyAuth::Password::Models::Account do
     user.save
     user.password_identities.count.should eq 2
     password_identities = user.password_identities
-    password_identities.first.authenticate('password2').should_not be_nil
-    password_identities.last.authenticate('password2').should_not be_nil
+    password_identities.first.authenticate('password2').should be_true
+    password_identities.last.authenticate('password2').should be_true
   end
 
   it 'does not skip identity validations if new record with password' do
@@ -49,7 +49,19 @@ describe EasyAuth::Password::Models::Account do
 
     user.update_attribute(:username, 'testuser2')
     user.password_identities.last.uid.should eq 'testuser2'
-    user.password_identities.last.authenticate('password').should_not be_nil
+    user.password_identities.last.authenticate('password').should be_true
+  end
+
+  it 'updates the proper password identity, even with case changes' do
+    user = User.create(:email => 'test@example.com', :username => 'TESTUSER', :password => 'password', :password_confirmation => 'password')
+    user.password_identities.where(uid: 'TESTUSER').update_all(uid: 'testuser')
+    user = User.last
+
+    user.password = user.password_confirmation = 'foo'
+    user.save
+
+    user = User.last
+    user.password_identities.last.authenticate('foo').should be_true
   end
 
   context 'username' do
