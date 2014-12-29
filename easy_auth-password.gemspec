@@ -26,4 +26,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'factory_girl', '~> 2.6.0'
   s.add_development_dependency 'mocha', '~> 0.10.5'
   s.add_development_dependency 'launchy'
+  s.add_development_dependency 'rails', '< 4.2'
+  s.add_development_dependency 'test-unit'
 end
