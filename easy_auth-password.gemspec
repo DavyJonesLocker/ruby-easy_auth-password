@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = EasyAuth::Password::VERSION
   s.authors     = ['Brian Cardarella']
   s.email       = ['brian@dockyard.com', 'bcardarella@gmail.com']
-  s.homepage    = 'https://github.com/dockyard/easy_auth-password'
+  s.homepage    = 'https://github.com/dockyard/ruby-easy_auth-password'
   s.summary     = 'EasyAuth-Password'
   s.description = 'EasyAuth-Password'
 
