@@ -67,7 +67,7 @@ describe Identities::Password do
       it 'returns false' do
         identity = create(:password_identity, :account => build(:user))
         identity.reset_token_digest.should be_nil
-        identity.authenticate('bad_unencrypted_token', :reset_token_digest).should be_false
+        identity.authenticate('bad_unencrypted_token', :reset_token).should be_false
       end
     end
   end
