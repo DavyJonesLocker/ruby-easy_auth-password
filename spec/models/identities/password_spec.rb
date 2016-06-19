@@ -53,13 +53,22 @@ describe Identities::Password do
   end
 
   describe '#password_reset' do
-    it 'sets a unique reset token' do
-      identity = create(:password_identity, :account => build(:user))
-      identity.reset_token_digest.should be_nil
-      unencrypted_token = identity.generate_reset_token!
-      identity = Identities::Password.last
-      identity.reset_token_digest.should_not be_nil
-      SCrypt::Password.new(identity.reset_token_digest).should eq unencrypted_token
+    context 'normal process flow' do
+      it 'sets a unique reset token' do
+        identity = create(:password_identity, :account => build(:user))
+        identity.reset_token_digest.should be_nil
+        unencrypted_token = identity.generate_reset_token!
+        identity = Identities::Password.last
+        identity.reset_token_digest.should_not be_nil
+        SCrypt::Password.new(identity.reset_token_digest).should eq unencrypted_token
+      end
+    end
+    context 'attempt without a reset token' do
+      it 'returns false' do
+        identity = create(:password_identity, :account => build(:user))
+        identity.reset_token_digest.should be_nil
+        identity.authenticate('bad_unencrypted_token', :reset_token_digest).should be_false
+      end
     end
   end
 end
