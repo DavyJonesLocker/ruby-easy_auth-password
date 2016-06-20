@@ -51,7 +51,9 @@ module EasyAuth::Models::Identities::Password
   end
 
   def authenticate(unencrypted_token, token_name = :password)
-    SCrypt::Password.new(send("#{token_name}_digest")) == unencrypted_token && self
+    token_value = send("#{token_name}_digest")
+    return false unless token_value
+    SCrypt::Password.new(token_value) == unencrypted_token && self
   end
 
   def password=(unencrypted_password)
