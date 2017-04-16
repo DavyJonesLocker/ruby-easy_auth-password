@@ -60,7 +60,7 @@ module EasyAuth::Password::Models::Account
 
   def update_password_identities
     identity_uid_attributes.each do |attribute|
-      if send("#{attribute}_changed?")
+      if send("#{attribute}_changed?") && send("#{attribute}_was").try(:present?)
         identity = password_identities.find { |identity| identity.uid =~ match(send("#{attribute}_was")) }
       else
         identity = password_identities.find { |identity| identity.uid =~ match(send(attribute)) }
